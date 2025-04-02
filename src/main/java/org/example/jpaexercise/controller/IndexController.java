@@ -24,12 +24,14 @@ public class IndexController {
     public String index(Model model) {
         try (EntityManager entityManager = jpaConfig.getEntityManagerFactory().createEntityManager()) {
             entityManager.getTransaction().begin();
+            // 실제 DB 작업 수행 , 사용 후 닫아야 하지만 try-with-resources는 finally에서 자동으로 닫힘, begin -> 작업 시작
 
             Student student = new Student();
             student.setName(LocalDateTime.now().toString());
-            entityManager.persist(student);
+            entityManager.persist(student); // student 객체를 persistence Context에 등록+ DB에 저장 준비
             entityManager.getTransaction().commit();
-            // 닫아주는 건 따로 할 필요 없음 -> try-with-resource 구문은 아예 끝에 닫아줌
+            // 트랜잭션 커밋 -> persist 된 내용이 실제 DB에 반영 (INSERT SQL 실행)
+
 
             List<Student> students = entityManager.createQuery("SELECT s FROM Student s", Student.class).getResultList();
                 model.addAttribute("students", students);
